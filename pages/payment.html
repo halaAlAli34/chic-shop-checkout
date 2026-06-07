@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Payment — Chic Shop</title>
+  <link rel="stylesheet" href="../css/global.css" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <style>
+    .card-visual {
+      width: 100%;
+      max-width: 380px;
+      height: 218px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, #1a1a1a 0%, #2e2e2e 60%, #1a1a1a 100%);
+      padding: 28px;
+      margin-bottom: 32px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+
+    .card-visual::before {
+      content: '';
+      position: absolute;
+      top: -70px; right: -70px;
+      width: 220px; height: 220px;
+      border-radius: 50%;
+      background: rgba(184,146,74,0.12);
+    }
+
+    .card-visual::after {
+      content: '';
+      position: absolute;
+      bottom: -50px; left: 30px;
+      width: 160px; height: 160px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.03);
+    }
+
+    .card-chip {
+      width: 40px; height: 30px;
+      background: linear-gradient(135deg, #c8a96e, #e8c888);
+      border-radius: 6px;
+      margin-bottom: 28px;
+      position: relative; z-index: 1;
+    }
+
+    .card-number-display {
+      font-family: 'DM Mono', monospace;
+      font-size: 17px;
+      letter-spacing: 0.22em;
+      color: rgba(255,255,255,0.88);
+      margin-bottom: 20px;
+      position: relative; z-index: 1;
+    }
+
+    .card-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      position: relative; z-index: 1;
+    }
+
+    .card-bottom-label {
+      font-size: 9px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.38);
+      margin-bottom: 4px;
+    }
+
+    .card-bottom-value {
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      color: rgba(255,255,255,0.88);
+    }
+
+    .card-brand-display {
+      position: absolute;
+      top: 22px; right: 24px;
+      font-size: 13px;
+      font-family: 'DM Mono', monospace;
+      color: rgba(255,255,255,0.5);
+      z-index: 1;
+      letter-spacing: 0.06em;
+    }
+
+    .payment-tabs {
+      display: flex;
+      border: 2px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin-bottom: 28px;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 13px 12px;
+      border: none;
+      background: transparent;
+      font-family: 'Jost', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      border-right: 2px solid var(--border);
+    }
+
+    .tab-btn:last-child { border-right: none; }
+    .tab-btn.active { background: var(--ink); color: #fff; }
+    .tab-btn:not(.active):hover { background: #eee8e0; color: var(--ink); }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    .cvv-hint {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 6px;
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 400;
+    }
+
+    .security-block {
+      display: flex;
+      gap: 0;
+      background: white;
+      border: 2px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin-top: 24px;
+    }
+
+    .security-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 18px 12px;
+      text-align: center;
+      border-right: 1.5px solid var(--border);
+    }
+
+    .security-item:last-child { border-right: none; }
+    .security-item svg { color: var(--accent); }
+
+    .security-item h4 {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    .security-item p {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .alt-center {
+      padding: 36px 0;
+      text-align: center;
+    }
+
+    .alt-center .alt-icon {
+      width: 68px; height: 68px;
+      border-radius: var(--radius-xl);
+      background: var(--accent-light);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 20px;
+      color: var(--accent-dark);
+    }
+
+    .alt-center h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 24px;
+      font-weight: 400;
+      margin-bottom: 8px;
+    }
+
+    .alt-center p { font-size: 14px; color: var(--muted); margin-bottom: 28px; }
+
+    @media (max-width: 640px) {
+      .security-block { flex-direction: column; }
+      .security-item { border-right: none; border-bottom: 1.5px solid var(--border); }
+      .security-item:last-child { border-bottom: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-wrapper">
+    <main class="main-panel">
+
+      <a href="address.html" class="brand">
+        <div class="brand-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        </div>
+        <span class="brand-text">Chic <span>Shop</span></span>
+      </a>
+
+      <!-- Mobile/Tablet Order Summary Toggle -->
+      <div class="summary-toggle-wrapper">
+        <button class="summary-toggle-btn" id="summaryToggleBtn" type="button">
+          <span class="toggle-btn-left">
+            <i data-lucide="shopping-bag" width="16" height="16"></i>
+            <span class="toggle-btn-label">Show order summary</span>
+          </span>
+          <span style="display:flex;align-items:center;gap:8px">
+            <span class="toggle-btn-amount">—</span>
+            <i data-lucide="chevron-down" width="16" height="16" class="toggle-chevron"></i>
+          </span>
+        </button>
+        <div class="summary-drawer" id="summaryDrawer"></div>
+      </div>
+
+      <nav class="progress-steps fade-in">
+        <div class="step completed" data-step="1"><div class="step-num"><i data-lucide="check" width="13" height="13"></i></div><span class="step-label">Summary</span></div>
+        <div class="step-divider"></div>
+        <div class="step completed" data-step="2"><div class="step-num"><i data-lucide="check" width="13" height="13"></i></div><span class="step-label">Details</span></div>
+        <div class="step-divider"></div>
+        <div class="step completed" data-step="3"><div class="step-num"><i data-lucide="check" width="13" height="13"></i></div><span class="step-label">Address</span></div>
+        <div class="step-divider"></div>
+        <div class="step active" data-step="4"><div class="step-num">4</div><span class="step-label">Payment</span></div>
+        <div class="step-divider"></div>
+        <div class="step" data-step="5"><div class="step-num">5</div><span class="step-label">Confirm</span></div>
+      </nav>
+
+      <div class="fade-in fade-in-delay">
+        <p class="section-eyebrow">Step 4 of 5</p>
+        <h1 class="section-title">Payment<br><em>Details</em></h1>
+      </div>
+
+      <!-- Card Preview -->
+      <div class="card-visual fade-in fade-in-delay-2">
+        <div class="card-chip"></div>
+        <div class="card-number-display" id="cardNumDisplay">•••• •••• •••• ••••</div>
+        <div class="card-bottom">
+          <div>
+            <div class="card-bottom-label">Card Holder</div>
+            <div class="card-bottom-value" id="cardHolderDisplay">Full Name</div>
+          </div>
+          <div>
+            <div class="card-bottom-label">Expires</div>
+            <div class="card-bottom-value" id="cardExpiryDisplay">MM/YY</div>
+          </div>
+        </div>
+        <div class="card-brand-display" id="cardBrandDisplay">CARD</div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="payment-tabs fade-in fade-in-delay-2">
+        <button class="tab-btn active" onclick="switchTab('card', this)">
+          <i data-lucide="credit-card" width="15" height="15"></i> Credit/Debit
+        </button>
+        <button class="tab-btn" onclick="switchTab('paypal', this)">
+          <i data-lucide="wallet" width="15" height="15"></i> PayPal
+        </button>
+        <button class="tab-btn" onclick="switchTab('apple', this)">
+          <i data-lucide="smartphone" width="15" height="15"></i> Apple Pay
+        </button>
+      </div>
+
+      <!-- Card Tab -->
+      <div class="tab-content active" id="tab-card">
+        <form id="paymentForm" novalidate>
+          <div class="form-grid">
+
+            <div class="field full">
+              <label for="cardHolder">
+                <i data-lucide="user" width="13" height="13"></i>
+                Name on Card <span style="color:var(--error)">*</span>
+              </label>
+              <input type="text" id="cardHolder" placeholder="Jane Doe" autocomplete="cc-name" />
+              <span class="field-error"></span>
+            </div>
+
+            <div class="field full">
+              <label for="cardNumber">
+                <i data-lucide="credit-card" width="13" height="13"></i>
+                Card Number <span style="color:var(--error)">*</span>
+              </label>
+              <div class="card-input-wrapper">
+                <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456"
+                  autocomplete="cc-number" inputmode="numeric" maxlength="19" />
+                <span class="card-brand-icon" id="cardBrandIcon">
+                  <i data-lucide="credit-card" width="18" height="18"></i>
+                </span>
+              </div>
+              <span class="field-error"></span>
+            </div>
+
+            <div class="field">
+              <label for="expiry">
+                <i data-lucide="calendar" width="13" height="13"></i>
+                Expiry Date <span style="color:var(--error)">*</span>
+              </label>
+              <input type="text" id="expiry" placeholder="MM/YY" autocomplete="cc-exp"
+                inputmode="numeric" maxlength="5" />
+              <span class="field-error"></span>
+            </div>
+
+            <div class="field">
+              <label for="cvv">
+                <i data-lucide="lock" width="13" height="13"></i>
+                CVV / CVC <span style="color:var(--error)">*</span>
+              </label>
+              <input type="text" id="cvv" placeholder="•••" autocomplete="cc-csc"
+                inputmode="numeric" maxlength="4" />
+              <span class="field-error"></span>
+              <div class="cvv-hint">
+                <i data-lucide="info" width="12" height="12"></i>
+                3–4 digits on the back of your card
+              </div>
+            </div>
+
+            <div class="field full">
+              <label class="checkbox-field" for="saveCard">
+                <input type="checkbox" id="saveCard" />
+                <span class="check-box"></span>
+                <span class="check-label">Save this card for future purchases (encrypted and secure)</span>
+              </label>
+            </div>
+
+          </div>
+
+          <div class="security-block">
+            <div class="security-item">
+              <i data-lucide="shield" width="20" height="20"></i>
+              <h4>SSL Encrypted</h4>
+              <p>256-bit encryption</p>
+            </div>
+            <div class="security-item">
+              <i data-lucide="badge-check" width="20" height="20"></i>
+              <h4>PCI Compliant</h4>
+              <p>No raw card data stored</p>
+            </div>
+            <div class="security-item">
+              <i data-lucide="refresh-ccw" width="20" height="20"></i>
+              <h4>30-Day Returns</h4>
+              <p>No questions asked</p>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <a href="address.html" class="btn-secondary">
+              <i data-lucide="arrow-left" width="15" height="15"></i> Back
+            </a>
+            <button type="submit" class="btn-primary">
+              <span class="btn-text">Review Order</span>
+              <i data-lucide="arrow-right" width="15" height="15"></i>
+              <div class="spinner"></div>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- PayPal Tab -->
+      <div class="tab-content" id="tab-paypal">
+        <div class="alt-center">
+          <div class="alt-icon"><i data-lucide="wallet" width="30" height="30"></i></div>
+          <h3>Pay with PayPal</h3>
+          <p>You'll be redirected to PayPal to complete your payment securely.</p>
+          <button class="btn-primary" onclick="payWithAlt('paypal')" style="background:#003087;margin:0 auto">
+            <i data-lucide="external-link" width="15" height="15"></i>
+            <span>Continue to PayPal</span>
+          </button>
+        </div>
+        <div class="form-actions" style="border-top:none;padding-top:0;margin-top:0">
+          <a href="address.html" class="btn-secondary"><i data-lucide="arrow-left" width="15" height="15"></i> Back</a>
+        </div>
+      </div>
+
+      <!-- Apple Pay Tab -->
+      <div class="tab-content" id="tab-apple">
+        <div class="alt-center">
+          <div class="alt-icon"><i data-lucide="smartphone" width="30" height="30"></i></div>
+          <h3>Apple Pay</h3>
+          <p>Use Face ID or Touch ID to complete your purchase instantly.</p>
+          <button class="btn-primary" onclick="payWithAlt('apple')" style="background:#000;margin:0 auto">
+            <i data-lucide="fingerprint" width="15" height="15"></i>
+            <span>Pay with Apple Pay</span>
+          </button>
+        </div>
+        <div class="form-actions" style="border-top:none;padding-top:0;margin-top:0">
+          <a href="address.html" class="btn-secondary"><i data-lucide="arrow-left" width="15" height="15"></i> Back</a>
+        </div>
+      </div>
+
+    </main>
+
+    <aside class="side-panel">
+      <div class="side-brand">
+        <div class="side-brand-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#c8a96e"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        </div>
+        <span class="side-brand-text">Chic <span>Shop</span></span>
+      </div>
+      <div id="side-summary"></div>
+    </aside>
+  </div>
+
+  <script src="../js/shared.js"></script>
+  <script>
+    lucide.createIcons();
+    renderOrderSummary(document.getElementById('side-summary'));
+    initSummaryToggle();
+
+    function switchTab(name, btn) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tab-' + name).classList.add('active');
+    }
+
+    const numDisplay = document.getElementById('cardNumDisplay');
+    const holderDisplay = document.getElementById('cardHolderDisplay');
+    const expiryDisplay = document.getElementById('cardExpiryDisplay');
+    const brandDisplay = document.getElementById('cardBrandDisplay');
+    const cardNumInput = document.getElementById('cardNumber');
+    const cardHolderInput = document.getElementById('cardHolder');
+    const expiryInput = document.getElementById('expiry');
+
+    formatCardNumber(cardNumInput);
+    formatExpiry(expiryInput);
+
+    cardNumInput.addEventListener('input', () => {
+      const v = cardNumInput.value;
+      numDisplay.textContent = v || '•••• •••• •••• ••••';
+      const d = v.replace(/\s/g,'');
+      if (/^4/.test(d)) brandDisplay.textContent = 'VISA';
+      else if (/^5[1-5]/.test(d)) brandDisplay.textContent = 'MC';
+      else if (/^3[47]/.test(d)) brandDisplay.textContent = 'AMEX';
+      else brandDisplay.textContent = 'CARD';
+    });
+
+    cardHolderInput.addEventListener('input', () => {
+      holderDisplay.textContent = cardHolderInput.value || 'Full Name';
+    });
+
+    expiryInput.addEventListener('input', () => {
+      expiryDisplay.textContent = expiryInput.value || 'MM/YY';
+    });
+
+    const saved = Store.get('payment') || {};
+    if (saved.cardHolder) cardHolderInput.value = saved.cardHolder;
+    if (saved.expiry) expiryInput.value = saved.expiry;
+    holderDisplay.textContent = cardHolderInput.value || 'Full Name';
+    expiryDisplay.textContent = expiryInput.value || 'MM/YY';
+
+    const validatedFields = [
+      setupField(cardHolderInput, Validators.name),
+      setupField(cardNumInput, Validators.cardNumber),
+      setupField(expiryInput, Validators.expiry),
+      setupField(document.getElementById('cvv'), Validators.cvv),
+    ];
+
+    document.getElementById('paymentForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      if (!validateAll(validatedFields)) {
+        showToast('Please fix the errors above.', 'error');
+        return;
+      }
+      Store.set('payment', {
+        cardHolder: cardHolderInput.value.trim(),
+        last4: cardNumInput.value.replace(/\s/g,'').slice(-4),
+        expiry: expiryInput.value.trim(),
+        saveCard: document.getElementById('saveCard').checked,
+        method: 'card',
+      });
+      window.location.href = 'confirm.html';
+    });
+
+    function payWithAlt(method) {
+      Store.set('payment', { method });
+      window.location.href = 'confirm.html';
+    }
+  </script>
+</body>
+</html>

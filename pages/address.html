@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Address — Chic Shop</title>
+  <link rel="stylesheet" href="../css/global.css" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <style>
+    .address-block {
+      background: var(--card-bg);
+      border: 2px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 28px;
+      margin-bottom: 24px;
+    }
+
+    .address-block-title {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 22px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 600;
+    }
+
+    .address-block-title::after {
+      content: '';
+      flex: 1;
+      height: 2px;
+      background: var(--border);
+      border-radius: 2px;
+    }
+
+    /* Same-as toggle embedded inside the billing block header */
+    .billing-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 22px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .billing-header-title {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .same-as-toggle {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #f0ece5;
+      border: 1.5px solid var(--border);
+      border-radius: 30px;
+      padding: 6px 14px 6px 8px;
+      cursor: pointer;
+    }
+
+    .same-as-toggle .toggle-switch {
+      width: 36px;
+      height: 20px;
+    }
+
+    .same-as-toggle .toggle-track::after {
+      width: 14px; height: 14px;
+      top: 3px; left: 3px;
+    }
+
+    .same-as-toggle input:checked + .toggle-track::after {
+      transform: translateX(16px);
+    }
+
+    .same-as-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--ink);
+      white-space: nowrap;
+      letter-spacing: 0.02em;
+    }
+
+    /* Billing fields collapse */
+    #billingFields {
+      overflow: hidden;
+      transition: max-height 0.38s cubic-bezier(0.4,0,0.2,1), opacity 0.3s ease;
+    }
+
+    #billingFields.hidden {
+      max-height: 0;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    #billingFields.visible {
+      max-height: 900px;
+      opacity: 1;
+    }
+
+    /* Same-as confirmed state */
+    .same-address-confirmed {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 18px;
+      background: rgba(31,138,76,0.07);
+      border: 2px solid rgba(31,138,76,0.2);
+      border-radius: var(--radius-lg);
+      font-size: 13px;
+      color: var(--success);
+      font-weight: 600;
+    }
+
+    .same-address-confirmed.visible { display: flex; }
+
+    .country-select {
+      width: 100%;
+      padding: 14px 16px;
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      font-family: 'Jost', sans-serif;
+      font-size: 15px;
+      font-weight: 400;
+      color: var(--ink);
+      background: var(--card-bg);
+      transition: var(--transition);
+      outline: none;
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b6460' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 16px center;
+      padding-right: 40px;
+    }
+
+    .country-select:focus { border-color: var(--ink); box-shadow: 0 0 0 4px rgba(17,17,17,0.07); }
+
+    .shipping-methods { display: flex; flex-direction: column; gap: 12px; margin-top: 8px; }
+
+    .shipping-option {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 18px;
+      border: 2px solid var(--border);
+      border-radius: var(--radius-lg);
+      cursor: pointer;
+      transition: var(--transition);
+      background: var(--card-bg);
+    }
+
+    .shipping-option:hover { border-color: var(--border-strong); }
+    .shipping-option.selected { border-color: var(--ink); background: #f9f7f2; }
+    .shipping-option input[type="radio"] { accent-color: var(--ink); width: 16px; height: 16px; }
+    .shipping-option-info { flex: 1; }
+    .shipping-option-name { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+    .shipping-option-desc { font-size: 12px; color: var(--muted); font-family: 'DM Mono', monospace; }
+
+    .shipping-option-price {
+      font-family: 'DM Mono', monospace;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    .shipping-option-price.free { color: var(--success); }
+
+    .free-shipping-notice {
+      background: rgba(31,138,76,0.08);
+      border: 2px solid rgba(31,138,76,0.25);
+      border-radius: var(--radius-lg);
+      padding: 14px 18px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      color: var(--success);
+      font-weight: 600;
+    }
+
+    .section-label {
+      font-size: 12px;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-wrapper">
+    <main class="main-panel">
+
+      <a href="personal.html" class="brand">
+        <div class="brand-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        </div>
+        <span class="brand-text">Chic <span>Shop</span></span>
+      </a>
+
+      <!-- Mobile/Tablet Order Summary Toggle -->
+      <div class="summary-toggle-wrapper">
+        <button class="summary-toggle-btn" id="summaryToggleBtn" type="button">
+          <span class="toggle-btn-left">
+            <i data-lucide="shopping-bag" width="16" height="16"></i>
+            <span class="toggle-btn-label">Show order summary</span>
+          </span>
+          <span style="display:flex;align-items:center;gap:8px">
+            <span class="toggle-btn-amount">—</span>
+            <i data-lucide="chevron-down" width="16" height="16" class="toggle-chevron"></i>
+          </span>
+        </button>
+        <div class="summary-drawer" id="summaryDrawer"></div>
+      </div>
+
+      <nav class="progress-steps fade-in">
+        <div class="step completed" data-step="1"><div class="step-num"><i data-lucide="check" width="13" height="13"></i></div><span class="step-label">Summary</span></div>
+        <div class="step-divider"></div>
+        <div class="step completed" data-step="2"><div class="step-num"><i data-lucide="check" width="13" height="13"></i></div><span class="step-label">Details</span></div>
+        <div class="step-divider"></div>
+        <div class="step active" data-step="3"><div class="step-num">3</div><span class="step-label">Address</span></div>
+        <div class="step-divider"></div>
+        <div class="step" data-step="4"><div class="step-num">4</div><span class="step-label">Payment</span></div>
+        <div class="step-divider"></div>
+        <div class="step" data-step="5"><div class="step-num">5</div><span class="step-label">Confirm</span></div>
+      </nav>
+
+      <div class="fade-in fade-in-delay">
+        <p class="section-eyebrow">Step 3 of 5</p>
+        <h1 class="section-title">Shipping &<br><em>Billing Address</em></h1>
+      </div>
+
+      <form id="addressForm" novalidate>
+
+        <!-- ① SHIPPING ADDRESS -->
+        <div class="address-block fade-in fade-in-delay-2">
+          <div class="address-block-title">
+            <i data-lucide="truck" width="13" height="13"></i>
+            Shipping Address
+          </div>
+          <div class="form-grid">
+            <div class="field full">
+              <label for="shipStreet1">Street Address <span style="color:var(--error)">*</span></label>
+              <input type="text" id="shipStreet1" placeholder="123 Fashion Ave" autocomplete="shipping street-address" />
+              <span class="field-error"></span>
+            </div>
+            <div class="field full">
+              <label for="shipStreet2">Apt / Suite / Floor</label>
+              <input type="text" id="shipStreet2" placeholder="Apt 4B" autocomplete="shipping address-line2" />
+              <span class="field-error"></span>
+            </div>
+            <div class="field">
+              <label for="shipCity">City <span style="color:var(--error)">*</span></label>
+              <input type="text" id="shipCity" placeholder="New York" autocomplete="shipping address-level2" />
+              <span class="field-error"></span>
+            </div>
+            <div class="field">
+              <label for="shipState">State / Province <span style="color:var(--error)">*</span></label>
+              <input type="text" id="shipState" placeholder="NY" autocomplete="shipping address-level1" />
+              <span class="field-error"></span>
+            </div>
+            <div class="field">
+              <label for="shipZip">Postal Code <span style="color:var(--error)">*</span></label>
+              <input type="text" id="shipZip" placeholder="10001" autocomplete="shipping postal-code" />
+              <span class="field-error"></span>
+            </div>
+            <div class="field">
+              <label for="shipCountry">Country <span style="color:var(--error)">*</span></label>
+              <select id="shipCountry" class="country-select" autocomplete="shipping country">
+                <option value="">Select country…</option>
+                <option value="US">United States</option>
+                <option value="GB">United Kingdom</option>
+                <option value="CA">Canada</option>
+                <option value="AU">Australia</option>
+                <option value="DE">Germany</option>
+                <option value="FR">France</option>
+                <option value="IT">Italy</option>
+                <option value="ES">Spain</option>
+                <option value="LB">Lebanon</option>
+                <option value="AE">UAE</option>
+                <option value="JP">Japan</option>
+                <option value="OTHER">Other</option>
+              </select>
+              <span class="field-error"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ② SHIPPING METHOD -->
+        <div class="address-block fade-in fade-in-delay-2">
+          <div class="address-block-title">
+            <i data-lucide="package" width="13" height="13"></i>
+            Shipping Method
+          </div>
+          <div id="freeShippingNotice" style="display:none" class="free-shipping-notice">
+            <i data-lucide="check-circle-2" width="18" height="18"></i>
+            Your order qualifies for free shipping!
+          </div>
+          <div class="shipping-methods" id="shippingMethods"></div>
+        </div>
+
+        <!-- ③ BILLING ADDRESS -->
+        <div class="address-block fade-in fade-in-delay-3">
+
+          <!-- Header with inline same-as toggle -->
+          <div class="billing-header">
+            <div class="billing-header-title">
+              <i data-lucide="map-pin" width="13" height="13"></i>
+              Billing Address
+            </div>
+            <label class="same-as-toggle" for="sameAddress">
+              <label class="toggle-switch">
+                <input type="checkbox" id="sameAddress" checked onchange="toggleBilling()" />
+                <span class="toggle-track"></span>
+              </label>
+              <span class="same-as-label">Same as shipping</span>
+            </label>
+          </div>
+
+          <!-- Shown when same-as is ON -->
+          <div class="same-address-confirmed visible" id="sameAddressConfirmed">
+            <i data-lucide="check-circle-2" width="18" height="18"></i>
+            Billing address will match your shipping address.
+          </div>
+
+          <!-- Billing fields — shown when same-as is OFF -->
+          <div id="billingFields" class="hidden">
+            <div class="form-grid">
+              <div class="field full">
+                <label for="billStreet1">Street Address <span style="color:var(--error)">*</span></label>
+                <input type="text" id="billStreet1" placeholder="123 Fashion Ave" autocomplete="billing street-address" />
+                <span class="field-error"></span>
+              </div>
+              <div class="field full">
+                <label for="billStreet2">Apt / Suite / Floor</label>
+                <input type="text" id="billStreet2" placeholder="Apt 4B" autocomplete="billing address-line2" />
+                <span class="field-error"></span>
+              </div>
+              <div class="field">
+                <label for="billCity">City <span style="color:var(--error)">*</span></label>
+                <input type="text" id="billCity" placeholder="New York" autocomplete="billing address-level2" />
+                <span class="field-error"></span>
+              </div>
+              <div class="field">
+                <label for="billState">State / Province <span style="color:var(--error)">*</span></label>
+                <input type="text" id="billState" placeholder="NY" autocomplete="billing address-level1" />
+                <span class="field-error"></span>
+              </div>
+              <div class="field">
+                <label for="billZip">Postal Code <span style="color:var(--error)">*</span></label>
+                <input type="text" id="billZip" placeholder="10001" autocomplete="billing postal-code" />
+                <span class="field-error"></span>
+              </div>
+              <div class="field">
+                <label for="billCountry">Country <span style="color:var(--error)">*</span></label>
+                <select id="billCountry" class="country-select" autocomplete="billing country">
+                  <option value="">Select country…</option>
+                  <option value="US">United States</option>
+                  <option value="GB">United Kingdom</option>
+                  <option value="CA">Canada</option>
+                  <option value="AU">Australia</option>
+                  <option value="DE">Germany</option>
+                  <option value="FR">France</option>
+                  <option value="IT">Italy</option>
+                  <option value="ES">Spain</option>
+                  <option value="LB">Lebanon</option>
+                  <option value="AE">UAE</option>
+                  <option value="JP">Japan</option>
+                  <option value="OTHER">Other</option>
+                </select>
+                <span class="field-error"></span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="form-actions fade-in fade-in-delay-3">
+          <a href="personal.html" class="btn-secondary">
+            <i data-lucide="arrow-left" width="15" height="15"></i> Back
+          </a>
+          <button type="submit" class="btn-primary">
+            <span class="btn-text">Continue to Payment</span>
+            <i data-lucide="arrow-right" width="15" height="15"></i>
+          </button>
+        </div>
+
+      </form>
+    </main>
+
+    <aside class="side-panel">
+      <div class="side-brand">
+        <div class="side-brand-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#c8a96e"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        </div>
+        <span class="side-brand-text">Chic <span>Shop</span></span>
+      </div>
+      <div id="side-summary"></div>
+    </aside>
+  </div>
+
+  <script src="../js/shared.js"></script>
+  <script>
+    lucide.createIcons();
+    renderOrderSummary(document.getElementById('side-summary'));
+    initSummaryToggle();
+
+    // ── Shipping methods ──
+    function renderShippingMethods() {
+      const totals = getCartTotals();
+      const cart = Store.get('cart');
+      const current = cart.shippingMethod || 'standard';
+      const methods = [
+        { key: 'standard', name: 'Standard Delivery', desc: '5–7 business days', price: SHIPPING_COSTS.standard },
+        { key: 'express',  name: 'Express Delivery',  desc: '2–3 business days', price: SHIPPING_COSTS.express  },
+        { key: 'overnight',name: 'Overnight Delivery',desc: 'Next business day',  price: SHIPPING_COSTS.overnight},
+      ];
+      document.getElementById('freeShippingNotice').style.display = totals.shippingFree ? 'flex' : 'none';
+      document.getElementById('shippingMethods').innerHTML = methods.map(m => `
+        <label class="shipping-option ${m.key === current ? 'selected' : ''}" id="opt-${m.key}">
+          <input type="radio" name="shippingMethod" value="${m.key}" ${m.key === current ? 'checked' : ''} onchange="selectShipping(this)" />
+          <div class="shipping-option-info">
+            <div class="shipping-option-name">${m.name}</div>
+            <div class="shipping-option-desc">${m.desc}</div>
+          </div>
+          <span class="shipping-option-price ${totals.shippingFree ? 'free' : ''}">
+            ${totals.shippingFree ? 'Free' : '$' + m.price.toFixed(2)}
+          </span>
+        </label>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    function selectShipping(radio) {
+      document.querySelectorAll('.shipping-option').forEach(el => el.classList.remove('selected'));
+      radio.closest('.shipping-option').classList.add('selected');
+      const cart = Store.get('cart');
+      cart.shippingMethod = radio.value;
+      Store.set('cart', cart);
+      renderOrderSummary(document.getElementById('side-summary'));
+    }
+
+    // ── Billing toggle ──
+    function toggleBilling() {
+      const same = document.getElementById('sameAddress').checked;
+      const fields = document.getElementById('billingFields');
+      const confirmed = document.getElementById('sameAddressConfirmed');
+
+      // Show billing fields when NOT same, hide when same
+      fields.classList.toggle('hidden', same);
+      fields.classList.toggle('visible', !same);
+      confirmed.classList.toggle('visible', same);
+    }
+
+    // ── Validators ──
+    const shipFields = [
+      setupField(document.getElementById('shipStreet1'), Validators.required),
+      setupField(document.getElementById('shipCity'),    Validators.required),
+      setupField(document.getElementById('shipState'),   Validators.required),
+      setupField(document.getElementById('shipZip'),     Validators.zip),
+      setupField(document.getElementById('shipCountry'), Validators.required),
+    ];
+
+    function getBillFields() {
+      return [
+        setupField(document.getElementById('billStreet1'), Validators.required),
+        setupField(document.getElementById('billCity'),    Validators.required),
+        setupField(document.getElementById('billState'),   Validators.required),
+        setupField(document.getElementById('billZip'),     Validators.zip),
+        setupField(document.getElementById('billCountry'), Validators.required),
+      ];
+    }
+
+    // ── Prefill saved data ──
+    const saved = Store.get('address') || {};
+
+    if (saved.shipping) {
+      const s = saved.shipping;
+      if (s.street1) document.getElementById('shipStreet1').value = s.street1;
+      if (s.street2) document.getElementById('shipStreet2').value = s.street2;
+      if (s.city)    document.getElementById('shipCity').value    = s.city;
+      if (s.state)   document.getElementById('shipState').value   = s.state;
+      if (s.zip)     document.getElementById('shipZip').value     = s.zip;
+      if (s.country) document.getElementById('shipCountry').value = s.country;
+    }
+
+    if (saved.sameAddress === false) {
+      document.getElementById('sameAddress').checked = false;
+      toggleBilling();
+      if (saved.billing) {
+        const b = saved.billing;
+        if (b.street1) document.getElementById('billStreet1').value = b.street1;
+        if (b.street2) document.getElementById('billStreet2').value = b.street2;
+        if (b.city)    document.getElementById('billCity').value    = b.city;
+        if (b.state)   document.getElementById('billState').value   = b.state;
+        if (b.zip)     document.getElementById('billZip').value     = b.zip;
+        if (b.country) document.getElementById('billCountry').value = b.country;
+      }
+    }
+
+    renderShippingMethods();
+
+    // ── Submit ──
+    document.getElementById('addressForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      let valid = validateAll(shipFields);
+      const same = document.getElementById('sameAddress').checked;
+      if (!same && !validateAll(getBillFields())) valid = false;
+
+      if (!valid) {
+        showToast('Please fix the errors above.', 'error');
+        this.querySelector('input.error, select.error')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+
+      const shipping = {
+        street1: document.getElementById('shipStreet1').value.trim(),
+        street2: document.getElementById('shipStreet2').value.trim(),
+        city:    document.getElementById('shipCity').value.trim(),
+        state:   document.getElementById('shipState').value.trim(),
+        zip:     document.getElementById('shipZip').value.trim(),
+        country: document.getElementById('shipCountry').value,
+      };
+
+      const billing = same ? { ...shipping } : {
+        street1: document.getElementById('billStreet1').value.trim(),
+        street2: document.getElementById('billStreet2').value.trim(),
+        city:    document.getElementById('billCity').value.trim(),
+        state:   document.getElementById('billState').value.trim(),
+        zip:     document.getElementById('billZip').value.trim(),
+        country: document.getElementById('billCountry').value,
+      };
+
+      const method = document.querySelector('input[name="shippingMethod"]:checked').value;
+      Store.set('address', { shipping, billing, sameAddress: same, method });
+      window.location.href = 'payment.html';
+    });
+  </script>
+</body>
+</html>

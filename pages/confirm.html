@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Confirm Order — Chic Shop</title>
+  <link rel="stylesheet" href="../css/global.css" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <style>
+    .review-section {
+      background: var(--card-bg);
+      border: 2px solid var(--border);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+
+    .review-section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 22px;
+      border-bottom: 2px solid var(--border);
+      background: #f5f1eb;
+    }
+
+    .review-section-header h3 {
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .review-edit {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      text-decoration: none;
+      font-family: 'Jost', sans-serif;
+      font-weight: 600;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .review-edit:hover { color: var(--ink); }
+
+    .review-section-body { padding: 18px 22px; }
+
+    .review-row {
+      display: flex;
+      gap: 16px;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
+    .review-row:last-child { margin-bottom: 0; }
+
+    .review-row .rlabel { color: var(--muted); min-width: 96px; flex-shrink: 0; font-weight: 500; font-size: 13px; }
+    .review-row .rval { color: var(--ink); font-weight: 400; }
+
+    .order-items-review { display: flex; flex-direction: column; gap: 12px; }
+
+    .review-item {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .review-item-thumb {
+      width: 46px; height: 46px;
+      background: var(--accent-light);
+      border-radius: var(--radius-lg);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      color: var(--accent-dark);
+    }
+
+    .review-item-name { font-size: 14px; font-weight: 600; }
+    .review-item-variant { font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; }
+    .review-item-price { margin-left: auto; font-family: 'DM Mono', monospace; font-size: 14px; font-weight: 600; }
+
+    .card-last4 {
+      font-family: 'DM Mono', monospace;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 500;
+    }
+
+    .card-dots { color: var(--muted); letter-spacing: 0.15em; }
+
+    .total-bar {
+      background: var(--ink);
+      color: white;
+      border-radius: var(--radius-xl);
+      padding: 22px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .total-bar .tl { font-size: 13px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; }
+    .total-bar .ta { font-family: 'Cormorant Garamond', serif; font-size: 36px; font-weight: 400; }
+
+    .terms-text {
+      font-size: 12px;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.7;
+      margin-top: 14px;
+      font-weight: 400;
+    }
+
+    .terms-text a { color: var(--ink); font-weight: 600; }
+
+    .processing-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(245,241,235,0.96);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+
+    .processing-overlay.active { opacity: 1; pointer-events: all; }
+
+    .processing-ring {
+      width: 72px; height: 72px;
+      border: 3px solid var(--border);
+      border-top-color: var(--ink);
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+      margin-bottom: 24px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .processing-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 30px;
+      font-weight: 400;
+      margin-bottom: 8px;
+    }
+
+    .processing-subtitle { font-size: 14px; color: var(--muted); margin-bottom: 28px; }
+
+    .processing-step {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px;
+      color: var(--muted);
+      opacity: 0;
+      transform: translateX(-10px);
+      transition: all 0.35s;
+      margin-bottom: 10px;
+      font-weight: 500;
+    }
+
+    .processing-step.done { opacity: 1; transform: translateX(0); color: var(--ink); }
+
+    .processing-step-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--border);
+      flex-shrink: 0;
+    }
+
+    .processing-step.done .processing-step-dot { background: var(--success); }
+  </style>
+</head>
+<body>
+
+  <div class="processing-overlay" id="processingOverlay">
+    <div class="processing-ring"></div>
+    <h2 class="processing-title">Processing Payment</h2>
+    <p class="processing-subtitle">Please don't close this window</p>
+    <div>
+      <div class="processing-step" id="pstep1"><div class="processing-step-dot"></div> Verifying payment details</div>
+      <div class="processing-step" id="pstep2"><div class="processing-step-dot"></div> Authorizing transaction</div>
+      <div class="processing-step" id="pstep3"><div class="processing-step-dot"></div> Confirming order</div>
+    </div>
+  </div>
+
+  <div class="page-wrapper">
+    <main class="main-panel">
+
+      <a href="payment.html" class="brand">
+        <div class="brand-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        </div>
+        <span class="brand-text">Chic <span>Shop</span></span>
+      </a>
+
+      <!-- Mobile/Tablet Order Summary Toggle -->
+      <div class="summary-toggle-wrapper">
+        <button class="summary-toggle-btn" id="summaryToggleBtn" type="button">
+          <span class="toggle-btn-left">
+            <i data-lucide="shopping-bag" width="16" height="16"></i>
+            <span class="toggle-btn-label">Show order summary</span>
+          </span>
+          <span style="display:flex;align-items:center;gap:8px">
+            <span class="toggle-btn-amount">—</span>
+            <i data-lucide="chevron-down" width="16" height="16" class="toggle-chevron"></i>
+          </span>
+        </button>
+        <div class="summary-drawer" id="summaryDrawer"></div>
+      </div>
+
+      <nav class="progress-steps fade-in">
+        <div class="step completed" data-step="1"><div class="step-num"><i data-lucide="check" width="13" height="13"></i></div><span class="step-label">Summary</span></div>
+        <div class="step-divider"></div>
+        <div class="step completed" data-step="2"><div class="step-num"><i data-lucide="check" width="13" height="13"></i></div><span class="step-label">Details</span></div>
+        <div class="step-divider"></div>
+        <div class="step completed" data-step="3"><div class="step-num"><i data-lucide="check" width="13" height="13"></i></div><span class="step-label">Address</span></div>
+        <div class="step-divider"></div>
+        <div class="step completed" data-step="4"><div class="step-num"><i data-lucide="check" width="13" height="13"></i></div><span class="step-label">Payment</span></div>
+        <div class="step-divider"></div>
+        <div class="step active" data-step="5"><div class="step-num">5</div><span class="step-label">Confirm</span></div>
+      </nav>
+
+      <div class="fade-in fade-in-delay">
+        <p class="section-eyebrow">Step 5 of 5</p>
+        <h1 class="section-title">Review &<br><em>Place Order</em></h1>
+      </div>
+
+      <div id="reviewContent" class="fade-in fade-in-delay-2"></div>
+
+      <div class="total-bar fade-in fade-in-delay-3" id="totalBar"></div>
+
+      <div class="fade-in fade-in-delay-3">
+        <button class="btn-primary" id="placeOrderBtn" onclick="placeOrder()" style="width:100%;justify-content:center">
+          <i data-lucide="lock" width="15" height="15"></i>
+          <span class="btn-text">Place Order Securely</span>
+          <div class="spinner"></div>
+        </button>
+        <p class="terms-text">
+          By placing your order you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.<br>
+          Your card will be charged <strong>$<span id="termsTotal"></span></strong>.
+        </p>
+      </div>
+
+      <div class="form-actions" style="margin-top:20px">
+        <a href="payment.html" class="btn-secondary"><i data-lucide="arrow-left" width="15" height="15"></i> Edit Payment</a>
+      </div>
+    </main>
+
+    <aside class="side-panel">
+      <div class="side-brand">
+        <div class="side-brand-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#c8a96e"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        </div>
+        <span class="side-brand-text">Chic <span>Shop</span></span>
+      </div>
+      <div id="side-summary"></div>
+    </aside>
+  </div>
+
+  <script src="../js/shared.js"></script>
+  <script>
+    lucide.createIcons();
+    renderOrderSummary(document.getElementById('side-summary'));
+    initSummaryToggle();
+
+    const data = Store.getAll();
+    const totals = getCartTotals();
+
+    function renderReview() {
+      const p = data.personal || {};
+      const a = data.address || {};
+      const pm = data.payment || {};
+      const cart = data.cart || { items: [] };
+      const billing = a.billing || {};
+      const shipping = a.shipping || {};
+      const methodLabels = { standard: 'Standard (5–7 days)', express: 'Express (2–3 days)', overnight: 'Overnight' };
+
+      let paymentDisplay = '';
+      if (pm.method === 'card') {
+        paymentDisplay = `<span class="card-last4"><span class="card-dots">•••• •••• ••••</span> ${pm.last4 || '????'}</span>`;
+      } else if (pm.method === 'paypal') {
+        paymentDisplay = 'PayPal';
+      } else if (pm.method === 'apple') {
+        paymentDisplay = 'Apple Pay';
+      }
+
+      document.getElementById('reviewContent').innerHTML = `
+        <div class="review-section">
+          <div class="review-section-header">
+            <h3><i data-lucide="shopping-bag" width="12" height="12"></i> Order Items</h3>
+            <a href="summary.html" class="review-edit"><i data-lucide="pencil" width="11" height="11"></i> Edit</a>
+          </div>
+          <div class="review-section-body">
+            <div class="order-items-review">
+              ${cart.items.map(item => `
+                <div class="review-item">
+                  <div class="review-item-thumb"><i data-lucide="${item.lucideIcon || 'package'}" width="20" height="20"></i></div>
+                  <div>
+                    <div class="review-item-name">${item.name}</div>
+                    <div class="review-item-variant">${item.variant} × ${item.qty}</div>
+                  </div>
+                  <div class="review-item-price">$${(item.price * item.qty).toFixed(2)}</div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+
+        <div class="review-section">
+          <div class="review-section-header">
+            <h3><i data-lucide="user" width="12" height="12"></i> Contact</h3>
+            <a href="personal.html" class="review-edit"><i data-lucide="pencil" width="11" height="11"></i> Edit</a>
+          </div>
+          <div class="review-section-body">
+            <div class="review-row"><span class="rlabel">Name</span><span class="rval">${p.fullName || '—'}</span></div>
+            <div class="review-row"><span class="rlabel">Email</span><span class="rval">${p.email || '—'}</span></div>
+            <div class="review-row"><span class="rlabel">Phone</span><span class="rval">${p.phone || '—'}</span></div>
+            ${p.orderNotes ? `<div class="review-row"><span class="rlabel">Notes</span><span class="rval">${p.orderNotes}</span></div>` : ''}
+          </div>
+        </div>
+
+        <div class="review-section">
+          <div class="review-section-header">
+            <h3><i data-lucide="map-pin" width="12" height="12"></i> Address</h3>
+            <a href="address.html" class="review-edit"><i data-lucide="pencil" width="11" height="11"></i> Edit</a>
+          </div>
+          <div class="review-section-body">
+            <div class="review-row"><span class="rlabel">Billing</span><span class="rval">${[billing.street1, billing.city, billing.state, billing.zip, billing.country].filter(Boolean).join(', ') || '—'}</span></div>
+            <div class="review-row"><span class="rlabel">Shipping</span><span class="rval">${[shipping.street1, shipping.city, shipping.state, shipping.zip, shipping.country].filter(Boolean).join(', ') || '—'}</span></div>
+            <div class="review-row"><span class="rlabel">Method</span><span class="rval">${methodLabels[a.method] || 'Standard'}</span></div>
+          </div>
+        </div>
+
+        <div class="review-section" style="margin-bottom:24px">
+          <div class="review-section-header">
+            <h3><i data-lucide="credit-card" width="12" height="12"></i> Payment</h3>
+            <a href="payment.html" class="review-edit"><i data-lucide="pencil" width="11" height="11"></i> Edit</a>
+          </div>
+          <div class="review-section-body">
+            <div class="review-row"><span class="rlabel">Method</span><span class="rval">${paymentDisplay}</span></div>
+            ${pm.cardHolder ? `<div class="review-row"><span class="rlabel">Name</span><span class="rval">${pm.cardHolder}</span></div>` : ''}
+            ${pm.expiry ? `<div class="review-row"><span class="rlabel">Expires</span><span class="rval">${pm.expiry}</span></div>` : ''}
+          </div>
+        </div>
+      `;
+
+      document.getElementById('totalBar').innerHTML = `
+        <span class="tl">Order Total</span>
+        <span class="ta">$${totals.total.toFixed(2)}</span>
+      `;
+
+      document.getElementById('termsTotal').textContent = totals.total.toFixed(2);
+      lucide.createIcons();
+    }
+
+    renderReview();
+
+    function placeOrder() {
+      const overlay = document.getElementById('processingOverlay');
+      overlay.classList.add('active');
+      setTimeout(() => document.getElementById('pstep1').classList.add('done'), 800);
+      setTimeout(() => document.getElementById('pstep2').classList.add('done'), 1800);
+      setTimeout(() => document.getElementById('pstep3').classList.add('done'), 2800);
+      const success = Math.random() > 0.2;
+      setTimeout(() => {
+        overlay.classList.remove('active');
+        window.location.href = success ? 'success.html' : 'failure.html';
+      }, 3800);
+    }
+  </script>
+</body>
+</html>

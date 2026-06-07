@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Checkout — Chic Shop</title>
+  <link rel="stylesheet" href="../css/global.css" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <style>
+    .item-card {
+      display: grid;
+      grid-template-columns: 76px 1fr auto;
+      gap: 20px;
+      align-items: center;
+      padding: 22px 0;
+      border-bottom: 1.5px solid var(--border);
+    }
+    .item-card:first-child { border-top: 1.5px solid var(--border); }
+
+    .item-image {
+      width: 76px; height: 76px;
+      background: var(--accent-light);
+      border-radius: var(--radius-lg);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--accent-dark);
+    }
+
+    .item-info h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 18px;
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+
+    .item-info p {
+      font-size: 12px;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      margin-bottom: 10px;
+    }
+
+    .qty-control {
+      display: inline-flex;
+      align-items: center;
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: white;
+    }
+
+    .qty-btn {
+      width: 32px; height: 32px;
+      border: none; background: none;
+      cursor: pointer;
+      color: var(--muted);
+      transition: var(--transition);
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .qty-btn:hover { background: var(--warm-white); color: var(--ink); }
+
+    .qty-value {
+      width: 34px; height: 32px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      font-weight: 600;
+      border-left: 1.5px solid var(--border);
+      border-right: 1.5px solid var(--border);
+      color: var(--ink);
+    }
+
+    .item-price-col {
+      text-align: right;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 10px;
+    }
+
+    .item-unit-price {
+      font-family: 'DM Mono', monospace;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    .remove-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--muted);
+      display: flex; align-items: center; gap: 4px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-family: 'Jost', sans-serif;
+      font-weight: 500;
+      padding: 0;
+      transition: var(--transition);
+    }
+
+    .remove-btn:hover { color: var(--error); }
+
+    .totals-block {
+      padding: 24px 0 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .totals-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+      font-weight: 400;
+    }
+
+    .totals-row .label { color: var(--muted); }
+    .totals-row .val { font-family: 'DM Mono', monospace; font-weight: 600; }
+    .totals-row.free .val { color: var(--success); font-weight: 700; }
+
+    .free-hint {
+      font-size: 12px;
+      color: var(--success);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-weight: 500;
+      margin-top: -4px;
+    }
+
+    .upsell-hint {
+      font-size: 12px;
+      color: var(--accent-dark);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-weight: 500;
+      margin-top: -4px;
+    }
+
+    .totals-total {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding-top: 16px;
+      border-top: 2px solid var(--border);
+      margin-top: 6px;
+    }
+
+    .totals-total .label {
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .totals-total .val {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 34px;
+      font-weight: 400;
+    }
+
+    .promo-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .promo-row input {
+      flex: 1;
+      padding: 12px 16px;
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      outline: none;
+      transition: var(--transition);
+      font-weight: 500;
+    }
+
+    .promo-row input:focus { border-color: var(--ink); }
+
+    .promo-row button {
+      padding: 12px 20px;
+      background: transparent;
+      border: 2px solid var(--ink);
+      border-radius: var(--radius);
+      font-family: 'Jost', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: var(--transition);
+      white-space: nowrap;
+      color: var(--ink);
+    }
+
+    .promo-row button:hover { background: var(--ink); color: white; }
+
+    .promo-msg {
+      font-size: 12px;
+      margin-top: 6px;
+      min-height: 18px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .promo-msg.ok { color: var(--success); }
+    .promo-msg.bad { color: var(--error); }
+
+    .guarantee-strip {
+      display: flex;
+      gap: 0;
+      margin-top: 28px;
+      background: white;
+      border: 2px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+
+    .guarantee-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 16px 12px;
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      text-align: center;
+      border-right: 1.5px solid var(--border);
+    }
+
+    .guarantee-item:last-child { border-right: none; }
+    .guarantee-item svg { color: var(--accent); }
+
+    @media (max-width: 640px) {
+      .item-card { grid-template-columns: 60px 1fr; gap: 14px; }
+      .item-price-col { grid-column: 1 / -1; flex-direction: row; justify-content: space-between; align-items: center; }
+      .guarantee-strip { flex-direction: column; }
+      .guarantee-item { flex-direction: row; border-right: none; border-bottom: 1.5px solid var(--border); }
+      .guarantee-item:last-child { border-bottom: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-wrapper">
+    <main class="main-panel">
+
+      <!-- Logo -->
+      <a href="#" class="brand">
+        <div class="brand-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        </div>
+        <span class="brand-text">Chic <span>Shop</span></span>
+      </a>
+
+      <!-- Progress -->
+      <!-- Mobile/Tablet Order Summary Toggle -->
+      <div class="summary-toggle-wrapper">
+        <button class="summary-toggle-btn" id="summaryToggleBtn" type="button">
+          <span class="toggle-btn-left">
+            <i data-lucide="shopping-bag" width="16" height="16"></i>
+            <span class="toggle-btn-label">Show order summary</span>
+          </span>
+          <span style="display:flex;align-items:center;gap:8px">
+            <span class="toggle-btn-amount">—</span>
+            <i data-lucide="chevron-down" width="16" height="16" class="toggle-chevron"></i>
+          </span>
+        </button>
+        <div class="summary-drawer" id="summaryDrawer"></div>
+      </div>
+
+      <nav class="progress-steps fade-in">
+        <div class="step active" data-step="1">
+          <div class="step-num">1</div>
+          <span class="step-label">Summary</span>
+        </div>
+        <div class="step-divider"></div>
+        <div class="step" data-step="2">
+          <div class="step-num">2</div>
+          <span class="step-label">Details</span>
+        </div>
+        <div class="step-divider"></div>
+        <div class="step" data-step="3">
+          <div class="step-num">3</div>
+          <span class="step-label">Address</span>
+        </div>
+        <div class="step-divider"></div>
+        <div class="step" data-step="4">
+          <div class="step-num">4</div>
+          <span class="step-label">Payment</span>
+        </div>
+        <div class="step-divider"></div>
+        <div class="step" data-step="5">
+          <div class="step-num">5</div>
+          <span class="step-label">Confirm</span>
+        </div>
+      </nav>
+
+      <div class="fade-in fade-in-delay">
+        <p class="section-eyebrow">Step 1 of 5</p>
+        <h1 class="section-title">Your Cart</h1>
+      </div>
+
+      <div id="items-container" class="fade-in fade-in-delay-2"></div>
+
+      <!-- Promo -->
+      <div class="fade-in fade-in-delay-3" style="margin-top:28px">
+        <p style="font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;color:var(--ink);margin-bottom:10px">Promo Code</p>
+        <div class="promo-row">
+          <input type="text" id="promoInput" placeholder="CHIC20" maxlength="20" />
+          <button onclick="applyPromo()">Apply</button>
+        </div>
+        <p class="promo-msg" id="promoMsg"></p>
+      </div>
+
+      <!-- Totals -->
+      <div class="totals-block fade-in fade-in-delay-3" id="totals-container"></div>
+
+      <!-- Guarantees -->
+      <div class="guarantee-strip fade-in fade-in-delay-3">
+        <div class="guarantee-item">
+          <i data-lucide="shield-check" width="18" height="18"></i>
+          Secure Checkout
+        </div>
+        <div class="guarantee-item">
+          <i data-lucide="refresh-ccw" width="18" height="18"></i>
+          30-Day Returns
+        </div>
+        <div class="guarantee-item">
+          <i data-lucide="package" width="18" height="18"></i>
+          Free over $200
+        </div>
+      </div>
+
+      <div class="form-actions fade-in fade-in-delay-3">
+        <a href="#" class="btn-secondary" onclick="history.back()">
+          <i data-lucide="arrow-left" width="15" height="15"></i>
+          Continue Shopping
+        </a>
+        <button class="btn-primary" onclick="proceedToDetails()">
+          <span class="btn-text">Proceed to Details</span>
+          <i data-lucide="arrow-right" width="15" height="15"></i>
+        </button>
+      </div>
+    </main>
+
+    <aside class="side-panel">
+      <div class="side-brand">
+        <div class="side-brand-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#c8a96e"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        </div>
+        <span class="side-brand-text">Chic <span>Shop</span></span>
+      </div>
+      <div id="side-summary"></div>
+    </aside>
+  </div>
+
+  <script src="../js/shared.js"></script>
+  <script>
+    let cart = Store.get('cart');
+
+    function renderItems() {
+      const container = document.getElementById('items-container');
+      if (!cart.items.length) {
+        container.innerHTML = `<div style="padding:48px 0;text-align:center;color:var(--muted)"><i data-lucide="shopping-bag" width="48" height="48" style="display:block;margin:0 auto 16px;opacity:.3"></i><p style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300">Your cart is empty</p></div>`;
+        lucide.createIcons(); return;
+      }
+      container.innerHTML = cart.items.map((item, i) => `
+        <div class="item-card" data-id="${item.id}">
+          <div class="item-image">
+            <i data-lucide="${item.lucideIcon || 'package'}" width="30" height="30"></i>
+          </div>
+          <div class="item-info">
+            <h3>${item.name}</h3>
+            <p>${item.variant}</p>
+            <div class="qty-control">
+              <button class="qty-btn" onclick="changeQty(${i}, -1)"><i data-lucide="minus" width="13" height="13"></i></button>
+              <span class="qty-value">${item.qty}</span>
+              <button class="qty-btn" onclick="changeQty(${i}, 1)"><i data-lucide="plus" width="13" height="13"></i></button>
+            </div>
+          </div>
+          <div class="item-price-col">
+            <span class="item-unit-price">$${(item.price * item.qty).toFixed(2)}</span>
+            <button class="remove-btn" onclick="removeItem(${i})">
+              <i data-lucide="trash-2" width="12" height="12"></i> Remove
+            </button>
+          </div>
+        </div>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    function renderTotals() {
+      const totals = getCartTotals();
+      const subtotalAfterDiscount = totals.subtotal - totals.discount;
+      const remaining = FREE_SHIPPING_THRESHOLD - subtotalAfterDiscount;
+      let shippingHint = '';
+      if (totals.shippingFree) {
+        shippingHint = `<div class="free-hint"><i data-lucide="check-circle" width="12" height="12"></i> You qualify for free shipping!</div>`;
+      } else if (remaining > 0) {
+        shippingHint = `<div class="upsell-hint"><i data-lucide="truck" width="12" height="12"></i> Add $${remaining.toFixed(2)} more for free shipping</div>`;
+      }
+
+      document.getElementById('totals-container').innerHTML = `
+        <div class="totals-row"><span class="label">Subtotal</span><span class="val">$${totals.subtotal.toFixed(2)}</span></div>
+        ${totals.discount > 0 ? `<div class="totals-row" style="color:var(--success)"><span class="label">Discount${totals.discountPct ? ` (${totals.discountPct}%)` : ''}</span><span class="val">−$${totals.discount.toFixed(2)}</span></div>` : ''}
+        <div class="totals-row ${totals.shippingFree ? 'free' : ''}"><span class="label">Shipping</span><span class="val">${totals.shippingFree ? 'Free' : '$' + totals.shipping.toFixed(2)}</span></div>
+        ${shippingHint}
+        <div class="totals-row"><span class="label">Estimated tax</span><span class="val">$${totals.tax.toFixed(2)}</span></div>
+        <div class="totals-total">
+          <span class="label">Total</span>
+          <span class="val">$${totals.total.toFixed(2)}</span>
+        </div>
+      `;
+      lucide.createIcons();
+    }
+
+    function changeQty(index, delta) {
+      cart.items[index].qty = Math.max(1, cart.items[index].qty + delta);
+      Store.set('cart', cart);
+      renderItems(); renderTotals();
+      renderOrderSummary(document.getElementById('side-summary'));
+    initSummaryToggle();
+    }
+
+    function removeItem(index) {
+      cart.items.splice(index, 1);
+      Store.set('cart', cart);
+      renderItems(); renderTotals();
+      renderOrderSummary(document.getElementById('side-summary'));
+    }
+
+    // type 'pct' = percentage off subtotal, type 'flat' = fixed dollar off
+    const promoCodes = {
+      'CHIC20':    { type: 'pct',  value: 20 },
+      'SHOP15':    { type: 'flat', value: 15 },
+      'WELCOME10': { type: 'flat', value: 10 },
+    };
+
+    function applyPromo() {
+      const code = document.getElementById('promoInput').value.trim().toUpperCase();
+      const msgEl = document.getElementById('promoMsg');
+      const promo = promoCodes[code];
+      if (promo) {
+        cart.discount = promo;
+        Store.set('cart', cart);
+        const totals = getCartTotals();
+        const label = promo.type === 'pct'
+          ? `${promo.value}% off — you saved $${totals.discount.toFixed(2)}`
+          : `$${promo.value}.00 off`;
+        msgEl.className = 'promo-msg ok';
+        msgEl.innerHTML = `<i data-lucide="check-circle" width="13" height="13"></i> Code applied! ${label}`;
+        renderTotals();
+        renderOrderSummary(document.getElementById('side-summary'));
+      } else {
+        cart.discount = 0;
+        Store.set('cart', cart);
+        msgEl.className = 'promo-msg bad';
+        msgEl.innerHTML = `<i data-lucide="alert-circle" width="13" height="13"></i> Invalid code. Try CHIC20.`;
+        renderTotals();
+        renderOrderSummary(document.getElementById('side-summary'));
+      }
+      lucide.createIcons();
+    }
+
+    function proceedToDetails() {
+      if (!cart.items.length) { showToast('Your cart is empty.', 'error'); return; }
+      window.location.href = 'personal.html';
+    }
+
+    renderItems(); renderTotals();
+    renderOrderSummary(document.getElementById('side-summary'));
+    lucide.createIcons();
+  </script>
+</body>
+</html>

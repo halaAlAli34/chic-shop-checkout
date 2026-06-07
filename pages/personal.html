@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Personal Details — Chic Shop</title>
+  <link rel="stylesheet" href="../css/global.css" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<body>
+  <div class="page-wrapper">
+    <main class="main-panel">
+
+      <a href="summary.html" class="brand">
+        <div class="brand-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        </div>
+        <span class="brand-text">Chic <span>Shop</span></span>
+      </a>
+
+      <!-- Mobile/Tablet Order Summary Toggle -->
+      <div class="summary-toggle-wrapper">
+        <button class="summary-toggle-btn" id="summaryToggleBtn" type="button">
+          <span class="toggle-btn-left">
+            <i data-lucide="shopping-bag" width="16" height="16"></i>
+            <span class="toggle-btn-label">Show order summary</span>
+          </span>
+          <span style="display:flex;align-items:center;gap:8px">
+            <span class="toggle-btn-amount">—</span>
+            <i data-lucide="chevron-down" width="16" height="16" class="toggle-chevron"></i>
+          </span>
+        </button>
+        <div class="summary-drawer" id="summaryDrawer"></div>
+      </div>
+
+      <nav class="progress-steps fade-in">
+        <div class="step completed" data-step="1"><div class="step-num"><i data-lucide="check" width="13" height="13"></i></div><span class="step-label">Summary</span></div>
+        <div class="step-divider"></div>
+        <div class="step active" data-step="2"><div class="step-num">2</div><span class="step-label">Details</span></div>
+        <div class="step-divider"></div>
+        <div class="step" data-step="3"><div class="step-num">3</div><span class="step-label">Address</span></div>
+        <div class="step-divider"></div>
+        <div class="step" data-step="4"><div class="step-num">4</div><span class="step-label">Payment</span></div>
+        <div class="step-divider"></div>
+        <div class="step" data-step="5"><div class="step-num">5</div><span class="step-label">Confirm</span></div>
+      </nav>
+
+      <div class="fade-in fade-in-delay">
+        <p class="section-eyebrow">Step 2 of 5</p>
+        <h1 class="section-title">Personal<br><em>Information</em></h1>
+      </div>
+
+      <form id="personalForm" novalidate class="fade-in fade-in-delay-2">
+        <div class="form-grid">
+
+          <div class="field full">
+            <label for="fullName">
+              <i data-lucide="user" width="13" height="13"></i>
+              Full Name <span style="color:var(--error)">*</span>
+            </label>
+            <input type="text" id="fullName" placeholder="Jane Doe" autocomplete="name" />
+            <span class="field-error" id="fullName-err"></span>
+          </div>
+
+          <div class="field">
+            <label for="email">
+              <i data-lucide="mail" width="13" height="13"></i>
+              Email Address <span style="color:var(--error)">*</span>
+            </label>
+            <input type="email" id="email" placeholder="jane@example.com" autocomplete="email" />
+            <span class="field-error" id="email-err"></span>
+          </div>
+
+          <div class="field">
+            <label for="phone">
+              <i data-lucide="phone" width="13" height="13"></i>
+              Phone Number <span style="color:var(--error)">*</span>
+            </label>
+            <input type="tel" id="phone" placeholder="+1 555 000 0000" autocomplete="tel" />
+            <span class="field-error" id="phone-err"></span>
+          </div>
+
+          <div class="field full">
+            <div style="width:100%;height:2px;background:var(--border);margin:8px 0 24px;border-radius:2px"></div>
+            <p class="section-eyebrow" style="margin-bottom:0">Optional</p>
+          </div>
+
+          <div class="field full">
+            <label for="company">
+              <i data-lucide="briefcase" width="13" height="13"></i>
+              Company / Organization
+            </label>
+            <input type="text" id="company" placeholder="Acme Inc." autocomplete="organization" />
+            <span class="field-error"></span>
+          </div>
+
+          <div class="field full">
+            <label for="orderNotes">
+              <i data-lucide="message-square" width="13" height="13"></i>
+              Order Notes
+            </label>
+            <input type="text" id="orderNotes" placeholder="Special instructions for your order…" />
+            <span class="field-error"></span>
+          </div>
+
+          <div class="field full">
+            <label class="checkbox-field" for="newsletter">
+              <input type="checkbox" id="newsletter" />
+              <span class="check-box"></span>
+              <span class="check-label">Subscribe for exclusive offers and new arrivals.</span>
+            </label>
+          </div>
+
+          <div class="field full">
+            <label class="checkbox-field" for="createAccount">
+              <input type="checkbox" id="createAccount" />
+              <span class="check-box"></span>
+              <span class="check-label">Create an account for faster checkout next time.</span>
+            </label>
+          </div>
+
+        </div>
+
+        <div class="form-actions">
+          <a href="summary.html" class="btn-secondary">
+            <i data-lucide="arrow-left" width="15" height="15"></i>
+            Back
+          </a>
+          <button type="submit" class="btn-primary">
+            <span class="btn-text">Continue to Address</span>
+            <i data-lucide="arrow-right" width="15" height="15"></i>
+            <div class="spinner"></div>
+          </button>
+        </div>
+      </form>
+    </main>
+
+    <aside class="side-panel">
+      <div class="side-brand">
+        <div class="side-brand-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#c8a96e"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        </div>
+        <span class="side-brand-text">Chic <span>Shop</span></span>
+      </div>
+      <div id="side-summary"></div>
+    </aside>
+  </div>
+
+  <script src="../js/shared.js"></script>
+  <script>
+    lucide.createIcons();
+    renderOrderSummary(document.getElementById('side-summary'));
+    initSummaryToggle();
+
+    const saved = Store.get('personal') || {};
+    ['fullName','email','phone','company','orderNotes'].forEach(f => {
+      if (saved[f]) document.getElementById(f).value = saved[f];
+    });
+    if (saved.newsletter) document.getElementById('newsletter').checked = true;
+    if (saved.createAccount) document.getElementById('createAccount').checked = true;
+
+    const validatedFields = [
+      setupField(document.getElementById('fullName'), Validators.name),
+      setupField(document.getElementById('email'), Validators.email),
+      setupField(document.getElementById('phone'), Validators.phone),
+    ];
+
+    document.getElementById('personalForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      if (!validateAll(validatedFields)) {
+        showToast('Please fix the errors above.', 'error');
+        this.querySelector('input.error')?.scrollIntoView({ behavior:'smooth', block:'center' });
+        return;
+      }
+      Store.set('personal', {
+        fullName: document.getElementById('fullName').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        phone: document.getElementById('phone').value.trim(),
+        company: document.getElementById('company').value.trim(),
+        orderNotes: document.getElementById('orderNotes').value.trim(),
+        newsletter: document.getElementById('newsletter').checked,
+        createAccount: document.getElementById('createAccount').checked,
+      });
+      window.location.href = 'address.html';
+    });
+  </script>
+</body>
+</html>
