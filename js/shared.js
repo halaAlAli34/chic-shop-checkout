@@ -35,7 +35,7 @@ const Store = {
   }
 };
 
-// Default cart data — items use Lucide icon names instead of emojis
+// Default cart data — items use Lucide icon names 
 if (!Store.get('cart')) {
   Store.set('cart', {
     items: [

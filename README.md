@@ -1,4 +1,4 @@
-# Maison Elara — Frontend Checkout Flow
+# Chic Shop — Frontend Checkout Flow
 
 A complete, multi-page checkout experience built with vanilla HTML, CSS, and JavaScript. No frameworks, no build tools — just open and run.
 
@@ -61,7 +61,7 @@ Install the [Live Server extension](https://marketplace.visualstudio.com/items?i
 ### Functional
 - **5-step checkout flow**: Summary → Personal → Address → Payment → Confirm
 - **Cart management**: Quantity controls, item removal, running totals
-- **Promo codes**: Try `SUMMER20`, `ELARA10`, or `WELCOME5`
+- **Promo codes**: Try `chic20`, `ship15`, or `WELCOME10`
 - **Form validation**: Real-time inline errors on blur, full validation on submit
 - **Luhn algorithm**: Card number validity check
 - **Expiry validation**: Rejects past dates
